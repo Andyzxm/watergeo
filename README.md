@@ -17,7 +17,7 @@
 
 ## Here is a list of features that are included in this package(Work in Progress):
 
-- interactive map for US water accessbility
+- interactive map for US water accessibility
 - different water use layers
 - split map 
 - time series for water use in US
