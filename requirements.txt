@@ -19,6 +19,3 @@ python-box
 scooby
 whiteboxgui
 xyzservices
-leafmap
-duckdb
-geopanda
