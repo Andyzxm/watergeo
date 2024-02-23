@@ -8,8 +8,9 @@
 
 
 -   Free software: MIT License
--   Documentation: <https://Xinming Andy Zhang.github.io/watergeo>
+-   Documentation: <https://github.com/Andyzxm/watergeo>
     
+
 
 ## Features (Work in Progress):
 - interactive map for US water accessibility
