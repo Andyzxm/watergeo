@@ -3,3 +3,5 @@
 __author__ = """Xinming Zhang"""
 __email__ = "andyzxm1101@gmail.com"
 __version__ = "0.0.1"
+
+from .watergeo import *
