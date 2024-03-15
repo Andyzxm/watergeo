@@ -2,7 +2,7 @@ he Project Gutenberg eBook of Thunder in space
     
 This ebook is for the use of anyone anywhere in the United States and
 most other parts of the world at no cost and with almost no restrictions
-whatsoever. You may copy it, give it away or re-use it under the terms
+whatsoever. You may copy it, give it away or reuse it under the terms
 of the Project Gutenberg License included with this ebook or online
 at www.gutenberg.org. If you are not located in the United States,
 you will have to check the laws of the country where you are located
@@ -183,7 +183,7 @@ water, green forest and reddish brown barren patches. Over everything
 lay the almost fluorescent blue of atmosphere, forming a brilliant
 violet halo at the horizon. It looked incredibly beautiful. So, Blane
 thought, does a Portuguese man-of-war--until one sees the slime
-underneath or touches the poisoned stings.
+underneath or touches the poisoned strings.
 
 "Why can't they leave us alone?" Peal asked, as if reading Blane's
 mind. "Why can't they blow themselves up quietly without ruining our
@@ -564,7 +564,7 @@ Blane winced at the picture. A station was dependent on power for its
 existence. Lights, air circulation, water for balance, heat regulation,
 and even the growing of plants to keep the air breathable depended upon
 a steady supply of power. Like the _Goddard_, the _Tsiolkovsky_ used
-a reflecting trough on top that directed the intense solar radiation
+a reflecting through on top that directed the intense solar radiation
 onto a pipe filled with mercury which was heated to gaseous form and
 operated the boiler and generator. It was far cheaper and safer than
 atomic power.
@@ -1088,7 +1088,7 @@ there would be little warning.
 "It's not much of a secret, either," the scientist stated. "I don't
 think Manners said anything, and I've kept it as tight as I could. But
 there are indirect ways of noting things going on, and the temperature
-gages in the hull show signs already. The men who service the bomb bay
+gauges in the hull show signs already. The men who service the bomb bay
 aren't all fools, either. They can guess there's trouble when they're
 sent in for only minutes at a time. So rumors are spreading."
 
@@ -1606,7 +1606,7 @@ performed, viewed, copied or distributed:
 
     This eBook is for the use of anyone anywhere in the United States and most
     other parts of the world at no cost and with almost no restrictions
-    whatsoever. You may copy it, give it away or re-use it under the terms
+    whatsoever. You may copy it, give it away or reuse it under the terms
     of the Project Gutenberg License included with this eBook or online
     at www.gutenberg.org. If you
     are not located in the United States, you will have to check the laws
@@ -1833,7 +1833,7 @@ donate, please visit: www.gutenberg.org/donate.
 
 Section 5. General Information About Project Gutenberg™ electronic works
 
-Professor Michael S. Hart was the originator of the Project
+Professor Michael S. Heart was the originator of the Project
 Gutenberg™ concept of a library of electronic works that could be
 freely shared with anyone. For forty years, he produced and
 distributed Project Gutenberg™ eBooks with only a loose network of
