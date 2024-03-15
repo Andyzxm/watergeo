@@ -83,6 +83,7 @@ nav:
         - examples/intro.ipynb
     - Labs:
         - labs/lab4.ipynb
+        - labs/lab5.ipynb
     - API Reference:
           - watergeo module: watergeo.md
           - common module: common.md
