@@ -1,3 +1,0 @@
-# utility module
-
-::: watergeo.utility
