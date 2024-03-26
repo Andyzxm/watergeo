@@ -1,4 +1,4 @@
-"""This is the utils module that contains utility functions for the geohey package.
+"""This is the utility module that contains utility functions for the watergeo package.
 """
 
 
