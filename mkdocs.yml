@@ -80,7 +80,8 @@ nav:
     - Changelog: changelog.md
     - Report Issues: https://github.com/Xinming Andy Zhang/watergeo/issues
     - Examples:
-        - examples/intro.ipynb
+        - examples/Basemap.ipynb
+        
     - Labs:
         - labs/lab4.ipynb
         - labs/lab5.ipynb
