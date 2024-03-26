@@ -2,3 +2,4 @@ numpy
 leafmap
 geopandas
 ipyleaflet
+pandas
