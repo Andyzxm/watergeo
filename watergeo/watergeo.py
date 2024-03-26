@@ -12,13 +12,14 @@ class Map(ipyleaflet.Map):
     """
 
     def __init__(self, center=[20, 0], zoom=2, **kwargs):
-        super().__init__(center=center, zoom=zoom, **kwargs)
-    """Initialize the map.
+        """Initialize the map.
 
         Args:
             center (list, optional): Set the center of the map. Defaults to [20, 0].
             zoom (int, optional): Set the zoom level of the map. Defaults to 2.
         """
+        super().__init__(center=center, zoom=zoom, **kwargs)
+
     def add_tile_layer(self, url, name, **kwargs):
         layer = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
         self.add(layer)
@@ -43,12 +44,13 @@ class Map(ipyleaflet.Map):
             self.add(name)
 
     def add_layers_control(self, position="topright"):
-        self.add_control(ipyleaflet.LayersControl(position=position))
         """Adds a layers control to the map.
 
         Args:
             position (str, optional): The position of the layers control. Defaults to "topright".
         """
+        self.add_control(ipyleaflet.LayersControl(position=position))
+
     def add_geojson(self, data, name="geojson", **kwargs):
         """Adds a GeoJSON layer to the map.
 
