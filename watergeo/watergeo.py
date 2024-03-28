@@ -2,7 +2,7 @@
 
 import ipyleaflet
 from ipyleaflet import basemaps
-
+import ee
 
 class Map(ipyleaflet.Map):
     """This is the map class that inherits from ipyleaflet.Map.

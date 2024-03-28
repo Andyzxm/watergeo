@@ -3,3 +3,4 @@ leafmap
 geopandas
 ipyleaflet
 pandas
+ee
