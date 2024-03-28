@@ -97,4 +97,21 @@ class Map(ipyleaflet.Map):
 
         self.add_geojson(data, name, **kwargs)
 
-    
+    def add_ee_layer(self, ee_object, vis_params={}, name="Layer untitled", shown=True, opacity=1.0):
+        """
+        Adds Earth Engine data layers to the map.
+
+        Args:
+            ee_object (object): The Earth Engine object to add to the map.
+            vis_params (dict, optional): Visualization parameters. Defaults to {}.
+            name (str, optional): The name of the layer. Defaults to "Layer untitled".
+            shown (bool, optional): Whether to show the layer initially. Defaults to True.
+            opacity (float, optional): The opacity of the layer (between 0 and 1). Defaults to 1.0.
+        """
+        try:
+            import ee  # Import ee here
+            ee.Initialize()  # Initialize Earth Engine
+            ee_object.getInfo()  # Check if the object is valid
+        except Exception as e:
+            print("Error adding Earth Engine layer:", e)
+            return
