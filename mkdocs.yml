@@ -81,6 +81,7 @@ nav:
     - Report Issues: https://github.com/Xinming Andy Zhang/watergeo/issues
     - Examples:
         - examples/Basemap.ipynb
+        - examples/csv.ipynb
         
     - Labs:
         - labs/lab4.ipynb
@@ -88,4 +89,5 @@ nav:
     - API Reference:
           - watergeo module: watergeo.md
           - common module: common.md
+          - utility module: utility.md
 
