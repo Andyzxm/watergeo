@@ -3,6 +3,7 @@
 import ipyleaflet
 from ipyleaflet import basemaps
 import ee
+import geopandas as gpd
 
 class Map(ipyleaflet.Map):
     """This is the map class that inherits from ipyleaflet.Map.
@@ -115,3 +116,25 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             print("Error adding Earth Engine layer:", e)
             return
+        
+    
+    def add_shp(self, data, name="shp", **kwargs):
+        """
+        Adds a shapefile to the current map.
+
+        Args:
+            data (str or dict): The path to the shapefile as a string, or a dictionary representing the shapefile.
+            name (str, optional): The name of the layer. Defaults to "shp".
+            **kwargs: Arbitrary keyword arguments.
+
+        Raises:
+            TypeError: If the data is neither a string nor a dictionary representing a shapefile.
+
+        Returns:
+            None
+        """
+        if isinstance(data, str):
+            with shapefile.Reader(data) as shp:
+                data = shp.__geo_interface__
+
+        self.add_geojson(data, name, **kwargs)
