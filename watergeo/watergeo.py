@@ -117,27 +117,39 @@ class Map(ipyleaflet.Map):
             print("Error adding Earth Engine layer:", e)
             return
         
-
-    def add_vector(self, data, name="VectorLayer", **kwargs):
-        """Adds a vector layer to the map from any GeoPandas-supported vector data format.
+    def add_vector(self, data, name="vector", **kwargs):
+        """
+        Adds a vector layer to the current map.
 
         Args:
-            data (str, dict, or geopandas.GeoDataFrame): The vector data. It can be a path to a file (GeoJSON, shapefile), a GeoJSON dict, or a GeoDataFrame.
-            name (str, optional): The name of the layer. Defaults to "VectorLayer".
-        """
-        import geopandas as gpd
-        import json
+            data (str, GeoDataFrame, dict): The vector data as a string (path to file), GeoDataFrame, or a dictionary.
+            name (str, optional): The name of the layer. Defaults to "vector".
+            **kwargs: Arbitrary keyword arguments.
 
-        # Check the data type
-        if isinstance(data, gpd.GeoDataFrame):
-            geojson_data = json.loads(data.to_json())
-        # if data is a string or a dictionary
-        elif isinstance(data, (str, dict)):
-            # if data is a string
-            if isinstance(data, str):
-                data = gpd.read_file(data)
-                geojson_data = json.loads(data.to_json())
-            else:  # if data is a dictionary
-                geojson_data = data
+        Raises:
+            TypeError: If the data is not in a supported format.
+
+        Returns:
+            None
+        """
+        if isinstance(data, str):
+            if data.lower().endswith(('.geojson', '.json')):
+                # Load GeoJSON directly
+                with open(data) as f:
+                    data = json.load(f)
+                self.add_geojson(data, name, **kwargs)
+            elif data.lower().endswith(('.shp')):
+                # Read shapefile using GeoPandas and convert to GeoJSON
+                gdf = gpd.read_file(data)
+                self.add_geojson(gdf.__geo_interface__, name, **kwargs)
+            else:
+                raise TypeError("Unsupported vector data format.")
+        elif isinstance(data, gpd.GeoDataFrame):
+            self.add_geojson(data.__geo_interface__, name, **kwargs)
+        elif isinstance(data, dict):
+            self.add_geojson(data, name, **kwargs)
         else:
-            raise ValueError("Unsupported data format")
+            raise TypeError("Unsupported vector data format.")
+        
+        
+    
