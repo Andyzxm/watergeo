@@ -117,24 +117,27 @@ class Map(ipyleaflet.Map):
             print("Error adding Earth Engine layer:", e)
             return
         
-    
-    def add_shp(self, data, name="shp", **kwargs):
-        """
-        Adds a shapefile to the current map.
+
+    def add_vector(self, data, name="VectorLayer", **kwargs):
+        """Adds a vector layer to the map from any GeoPandas-supported vector data format.
 
         Args:
-            data (str or dict): The path to the shapefile as a string, or a dictionary representing the shapefile.
-            name (str, optional): The name of the layer. Defaults to "shp".
-            **kwargs: Arbitrary keyword arguments.
-
-        Raises:
-            TypeError: If the data is neither a string nor a dictionary representing a shapefile.
-
-        Returns:
-            None
+            data (str, dict, or geopandas.GeoDataFrame): The vector data. It can be a path to a file (GeoJSON, shapefile), a GeoJSON dict, or a GeoDataFrame.
+            name (str, optional): The name of the layer. Defaults to "VectorLayer".
         """
-        if isinstance(data, str):
-            with shapefile.Reader(data) as shp:
-                data = shp.__geo_interface__
+        import geopandas as gpd
+        import json
 
-        self.add_geojson(data, name, **kwargs)
+        # Check the data type
+        if isinstance(data, gpd.GeoDataFrame):
+            geojson_data = json.loads(data.to_json())
+        # if data is a string or a dictionary
+        elif isinstance(data, (str, dict)):
+            # if data is a string
+            if isinstance(data, str):
+                data = gpd.read_file(data)
+                geojson_data = json.loads(data.to_json())
+            else:  # if data is a dictionary
+                geojson_data = data
+        else:
+            raise ValueError("Unsupported data format")
