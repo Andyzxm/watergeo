@@ -83,6 +83,7 @@ nav:
         - examples/Basemap.ipynb
         - examples/csv.ipynb
         - examples/physical_water_surface.ipynb
+        - examples/vector.ipynb
     - Labs:
         - labs/lab4.ipynb
         - labs/lab5.ipynb
