@@ -4,7 +4,8 @@ from ipyleaflet import basemaps
 import ipywidgets as widgets
 import ee
 import geopandas as gpd
-import hydropy
+import json
+
 
 
 class Map(ipyleaflet.Map):
@@ -224,16 +225,3 @@ class Map(ipyleaflet.Map):
         else:
             raise TypeError("Unsupported vector data format.")
         
-    
-    def analyze_hydro(self, data):
-        """Performs hydrological analysis using HydroPy.
-
-        Args:
-            data (str): Path to hydrological data file.
-
-        Returns:
-            dict: Analysis results.
-        """
-        hydropy_instance = hydropy.HydroAnalysis(data)
-        analysis_results = hydropy_instance.analyze(data)
-        return analysis_results
