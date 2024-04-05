@@ -4,6 +4,7 @@ import ipyleaflet
 from ipyleaflet import basemaps
 import ee
 import geopandas as gpd
+import hydropy
 
 class Map(ipyleaflet.Map):
     """This is the map class that inherits from ipyleaflet.Map.
@@ -172,3 +173,16 @@ class Map(ipyleaflet.Map):
         if zoom_to_layer:
             self.center = client.center()
             self.zoom = client.default_zoom
+    
+    def analyze_hydro(self, data):
+        """Performs hydrological analysis using HydroPy.
+
+        Args:
+            data (str): Path to hydrological data file.
+
+        Returns:
+            dict: Analysis results.
+        """
+        hydropy_instance = hydropy.HydroAnalysis(data)
+        analysis_results = hydropy_instance.analyze(data)
+        return analysis_results
