@@ -5,7 +5,9 @@ import ipywidgets as widgets
 import ee
 import geopandas as gpd
 import json
-
+import requests
+import os
+import tempfile
 
 
 class Map(ipyleaflet.Map):
