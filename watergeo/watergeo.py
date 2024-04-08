@@ -127,18 +127,29 @@ class Map(ipyleaflet.Map):
         layer = ipyleaflet.ImageOverlay(url=url, bounds=bounds, name=name, **kwargs)
         self.add(layer)
 
+
     def add_raster(self, data, name="raster", zoom_to_layer=True, **kwargs):
         """Adds a raster layer to the map.
 
         Args:
-            data (str): The path to the raster file.
-            name (str, optional): The name of the layer. Defaults to "raster".
+        data (str): The path to the raster file or a URL.
+        name (str, optional): The name of the layer. Defaults to "raster".
         """
 
         try:
             from localtileserver import TileClient, get_leaflet_tile_layer
         except ImportError:
             raise ImportError("Please install the localtileserver package.")
+
+        if data.startswith('http://') or data.startswith('https://'):
+            response = requests.get(data, stream=True)
+            if response.status_code == 200:
+                with tempfile.NamedTemporaryFile(delete=False) as fp:
+                    for chunk in response.iter_content(1024):
+                        fp.write(chunk)
+                    data = fp.name
+            else:
+                raise ValueError(f"Failed to download {data}")
 
         client = TileClient(data)
         layer = get_leaflet_tile_layer(client, name=name, **kwargs)
@@ -147,6 +158,9 @@ class Map(ipyleaflet.Map):
         if zoom_to_layer:
             self.center = client.center()
             self.zoom = client.default_zoom
+
+        if data.startswith('http://') or data.startswith('https://'):
+            os.unlink(data)
 
     def add_zoom_slider(
         self, description="Zoom level", min=0, max=24, value=10, position="topright"
