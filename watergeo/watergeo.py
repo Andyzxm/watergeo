@@ -269,12 +269,17 @@ class Map(ipyleaflet.Map):
         self.add(control)
 
     def add_basemap_gui(self, basemaps=None, position="topright"):
-        """Adds a basemap GUI to the map.
-
-        Args:
-            position (str, optional): The position of the basemap GUI. Defaults to "topright".
         """
-
+        Adds a basemap GUI to the map. The GUI includes a dropdown list for selecting the basemap and a toggle button for showing and hiding the dropdown.
+    
+        The dropdown list includes options for different basemaps, such as "OpenStreetMap", "OpenTopoMap", "Esri.WorldImagery", and "Esri.NatGeoWorldMap". When a different option is selected in the dropdown, the basemap of the map is updated accordingly.
+    
+        The toggle button, represented by a 'times' icon when the dropdown is visible and a 'plus' icon when the dropdown is hidden, allows the user to show and hide the dropdown list. When the button is clicked, the visibility of the dropdown list is toggled.
+    
+        Args:
+            basemaps (list, optional): A list of basemaps to include in the dropdown. If not provided, a default list of basemaps is used.
+            position (str, optional): The position of the basemap GUI on the map. Defaults to "topright".
+        """
         basemap_selector = widgets.Dropdown(
             options=[
                 "OpenStreetMap",
@@ -284,11 +289,31 @@ class Map(ipyleaflet.Map):
             ],
             description="Basemap",
         )
-
+    
+        toggle_button = widgets.Button(
+            description="",
+            button_style="primary",
+            tooltip="Toggle dropdown",
+            icon="times",
+        )
+        toggle_button.layout.width = "35px"
+    
+        def toggle_dropdown(b):
+            if basemap_selector.layout.display == "none":
+                basemap_selector.layout.display = ""
+                toggle_button.icon = "times"
+            else:
+                basemap_selector.layout.display = "none"
+                toggle_button.icon = "plus"
+        toggle_button.on_click(toggle_dropdown)
+    
         def update_basemap(change):
             self.add_basemap(change["new"])
-
         basemap_selector.observe(update_basemap, "value")
-
-        control = ipyleaflet.WidgetControl(widget=basemap_selector, position=position)
+    
+        # Create a box to hold the dropdown and the button
+        box = widgets.HBox([basemap_selector, toggle_button])
+    
+        # Create a control with the box and add it to the map
+        control = ipyleaflet.WidgetControl(widget=box, position=position)
         self.add(control)
