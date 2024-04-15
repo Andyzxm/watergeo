@@ -8,6 +8,8 @@ import json
 import requests
 import os
 import tempfile
+from ipyleaflet import WidgetControl
+
 
 
 class Map(ipyleaflet.Map):
@@ -37,6 +39,8 @@ class Map(ipyleaflet.Map):
         super().__init__(center=center, zoom=zoom, **kwargs)
         if layer_control_flag:
             self.add_layers_control()
+        
+        self.basemap_gui_control = None
 
     def add_tile_layer(self, url, name, **kwargs):
         layer = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
@@ -188,25 +192,7 @@ class Map(ipyleaflet.Map):
         control = ipyleaflet.WidgetControl(widget=widget, position=position)
         self.add(control)
 
-    def add_ee_layer(self, ee_object, vis_params={}, name="Layer untitled", shown=True, opacity=1.0):
-        """
-        Adds Earth Engine data layers to the map.
-
-        Args:
-            ee_object (object): The Earth Engine object to add to the map.
-            vis_params (dict, optional): Visualization parameters. Defaults to {}.
-            name (str, optional): The name of the layer. Defaults to "Layer untitled".
-            shown (bool, optional): Whether to show the layer initially. Defaults to True.
-            opacity (float, optional): The opacity of the layer (between 0 and 1). Defaults to 1.0.
-        """
-        try:
-            import ee  # Import ee here
-            ee.Initialize()  # Initialize Earth Engine
-            ee_object.getInfo()  # Check if the object is valid
-        except Exception as e:
-            print("Error adding Earth Engine layer:", e)
-            return
-        
+    
     def add_vector(self, data, name="vector", **kwargs):
         """
         Adds a vector layer to the current map.
@@ -280,6 +266,8 @@ class Map(ipyleaflet.Map):
             basemaps (list, optional): A list of basemaps to include in the dropdown. If not provided, a default list of basemaps is used.
             position (str, optional): The position of the basemap GUI on the map. Defaults to "topright".
         """
+        if self.basemap_gui_control is not None:  # Check if the basemap GUI is already displayed
+            return  # If it is, do nothing and return
         basemap_selector = widgets.Dropdown(
             options=[
                 "OpenStreetMap",
@@ -310,10 +298,153 @@ class Map(ipyleaflet.Map):
         def update_basemap(change):
             self.add_basemap(change["new"])
         basemap_selector.observe(update_basemap, "value")
-    
+
+        
         # Create a box to hold the dropdown and the button
         box = widgets.HBox([basemap_selector, toggle_button])
     
-        # Create a control with the box and add it to the map
-        control = ipyleaflet.WidgetControl(widget=box, position=position)
-        self.add(control)
+        self.basemap_gui_control = WidgetControl(widget=box, position=position)
+        self.add_control(self.basemap_gui_control)
+
+        
+    def add_toolbar(self, position="topright"):
+        """Adds a toolbar to the map.
+
+        Args:
+            position (str, optional): The position of the toolbar. Defaults to "topright".
+        """
+
+        padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+
+        toolbar_button = widgets.ToggleButton(
+            value=False,
+            tooltip="Toolbar",
+            icon="wrench",
+            layout=widgets.Layout(width="28px", height="28px", padding=padding),
+        )
+
+        close_button = widgets.ToggleButton(
+            value=False,
+            tooltip="Close the tool",
+            icon="times",
+            button_style="primary",
+            layout=widgets.Layout(height="28px", width="28px", padding=padding),
+        )
+
+        toolbar = widgets.VBox([toolbar_button])
+
+        def close_click(change):
+            if change["new"]:
+                toolbar_button.close()
+                close_button.close()
+                toolbar.close()
+
+        close_button.observe(close_click, "value")
+
+        rows = 2
+        cols = 2
+        grid = widgets.GridspecLayout(
+            rows, cols, grid_gap="0px", layout=widgets.Layout(width="65px")
+        )
+
+        icons = ["folder-open", "map", "info", "question"]
+
+        for i in range(rows):
+            for j in range(cols):
+                grid[i, j] = widgets.Button(
+                    description="",
+                    button_style="primary",
+                    icon=icons[i * rows + j],
+                    layout=widgets.Layout(width="28px", padding="0px"),
+                )
+
+        def toolbar_click(change):
+            if change["new"]:
+                toolbar.children = [widgets.HBox([close_button, toolbar_button]), grid]
+            else:
+                toolbar.children = [toolbar_button]
+
+        # Add a new button to the toolbar for the basemap GUI
+
+        basemap_gui_button = widgets.Button(
+            description="",
+            button_style="primary",
+            tooltip='Toggle',  # Set tooltip to a shorter string
+            icon="globe",  # Use a different icon for the basemap GUI button
+            layout=widgets.Layout(width="28px", padding="0px"),
+        )
+
+        basemap_gui_button.description = "off"
+        grid[0, 0] = basemap_gui_button  # Replace this with the desired position
+
+        toolbar_button.observe(toolbar_click, "value")
+        toolbar_ctrl = WidgetControl(widget=toolbar, position="topright")
+        self.add(toolbar_ctrl)        
+
+
+        output = widgets.Output()
+        output_control = WidgetControl(widget=output, position="bottomright")
+        self.add(output_control)
+
+        def toolbar_callback(change):
+            with output:
+                output.clear_output()
+                if change.icon == "folder-open":
+                    print(f"You can open a file")
+                elif change.icon == "map":
+                    print(f"You can add a layer")
+                elif change.icon == "globe":
+                    if basemap_gui_button.description == "off" and self.basemap_gui_control is None:  # Check if the basemap GUI is not displayed and not already added
+                        self.add_basemap_gui()  # Call the add_basemap_gui function
+                        basemap_gui_button.description = "on"  # Update the state of the button
+                        print(f"Basemap GUI added")
+                    else:  # If the basemap GUI is displayed
+                        self.remove(self.basemap_gui_control)  # Remove the basemap GUI
+                        self.basemap_gui_control = None  # Reset the basemap GUI control
+                        basemap_gui_button.description = "off"  # Update the state of the button
+                        print(f"Basemap GUI removed")
+                
+                else:
+                    with output:
+                        output.clear_output()
+                    print(f"Icon: {change.icon}")
+
+        for tool in grid.children:
+            tool.on_click(toolbar_callback)
+
+    def add_ee_layer(self, ee_object, vis_params={}, name="Layer untitled", shown=True, opacity=1.0):
+        """
+        Adds Earth Engine data layers to the map.
+    
+        Args:
+            ee_object (object): The Earth Engine object to add to the map.
+            vis_params (dict, optional): Visualization parameters. Defaults to {}.
+            name (str, optional): The name of the layer. Defaults to "Layer untitled".
+            shown (bool, optional): Whether to show the layer initially. Defaults to True.
+            opacity (float, optional): The opacity of the layer (between 0 and 1). Defaults to 1.0.
+        """
+        try:
+            import ee  # Import ee here
+            ee.Initialize()  # Initialize Earth Engine
+            ee_object.getInfo()  # Check if the object is valid
+        except Exception as e:
+            print("Error adding Earth Engine layer:", e)
+            return
+    
+        # Generate a URL for fetching the tiles from Earth Engine
+        map_id_dict = ee.Image(ee_object).getMapId(vis_params)
+    
+        # Create a new tile layer
+        tiles_url = map_id_dict['tile_fetcher'].url_format
+        layer = ipyleaflet.TileLayer(
+            url=tiles_url,
+            attribution='Google Earth Engine',
+            name=name,
+            opacity=opacity,
+            visible=shown
+        )
+    
+        # Add the layer to the map
+        self.add_layer(layer)
+
+        

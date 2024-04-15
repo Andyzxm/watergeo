@@ -5,4 +5,3 @@ ipyleaflet
 pandas
 earthengine-api>=0.1.347
 ee
-hydropy
