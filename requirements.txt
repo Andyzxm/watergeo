@@ -3,5 +3,5 @@ leafmap
 geopandas
 ipyleaflet
 pandas
-earthengine-api>=0.1.347
+earthengine-api>=0.1.398
 ee
