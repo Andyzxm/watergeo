@@ -430,7 +430,10 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             print("Error adding Earth Engine layer:", e)
             return
-    
+
+        if isinstance(ee_object, ee.ImageCollection):
+            ee_object = ee_object.mosaic()
+
         # Generate a URL for fetching the tiles from Earth Engine
         map_id_dict = ee.Image(ee_object).getMapId(vis_params)
     
