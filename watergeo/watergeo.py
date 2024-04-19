@@ -450,4 +450,76 @@ class Map(ipyleaflet.Map):
         # Add the layer to the map
         self.add_layer(layer)
 
+    
+    def add_split_map(self, left_layer, right_layer, left_vis_params={}, right_vis_params={}, left_layer_name='Left Layer', right_layer_name='Right Layer'):
+        """
+        Adds a split map with two layers and centers the map on the bounds of the layers.
+
+        Args:
+        left_layer (object): The Earth Engine object to display on the left side.
+        right_layer (object): The Earth Engine object to display on the right side.
+        left_vis_params (dict, optional): Visualization parameters for the left layer. Defaults to {}.
+        right_vis_params (dict, optional): Visualization parameters for the right layer. Defaults to {}.
+        left_layer_name (str, optional): The name of the left layer. Defaults to 'Left Layer'.
+        right_layer_name (str, optional): The name of the right layer. Defaults to 'Right Layer'.
+        """
+        try:
+            import ee  # Import ee here
+            ee.Initialize()  # Initialize Earth Engine
+            left_layer.getInfo()  # Check if the left layer object is valid
+            right_layer.getInfo()  # Check if the right layer object is valid
+        except Exception as e:
+            print("Error adding Earth Engine layer:", e)
+            return
+
+        if isinstance(left_layer, ee.ImageCollection):
+            left_layer = left_layer.mosaic()
+
+        if isinstance(right_layer, ee.ImageCollection):
+            right_layer = right_layer.mosaic()
+
+        # Generate URLs for fetching the tiles from Earth Engine
+        left_map_id_dict = ee.Image(left_layer).getMapId(left_vis_params)
+        right_map_id_dict = ee.Image(right_layer).getMapId(right_vis_params)
+
+        # Create new tile layers
+        left_tiles_url = left_map_id_dict['tile_fetcher'].url_format
+        right_tiles_url = right_map_id_dict['tile_fetcher'].url_format
+
+        left_tile_layer = ipyleaflet.TileLayer(
+            url=left_tiles_url,
+            attribution='Google Earth Engine',
+            name='Left Layer',
+            opacity=1.0,
+            visible=True
+        )
+
+        right_tile_layer = ipyleaflet.TileLayer(
+            url=right_tiles_url,
+            attribution='Google Earth Engine',
+            name='Right Layer',
+            opacity=1.0,
+            visible=True
+        )
+
+        # Add the layers to the map
+        self.add_layer(left_tile_layer)
+        self.add_layer(right_tile_layer)
+
+        # Get the bounds of the left and right layers
+        left_bounds = ee.Image(left_layer).geometry().bounds().getInfo()['coordinates']
+        right_bounds = ee.Image(right_layer).geometry().bounds().getInfo()['coordinates']
         
+        # Calculate the center of the bounds
+        left_center = [(left_bounds[0][0][0] + left_bounds[0][2][0]) / 2, (left_bounds[0][0][1] + left_bounds[0][2][1]) / 2]
+        right_center = [(right_bounds[0][0][0] + right_bounds[0][2][0]) / 2, (right_bounds[0][0][1] + right_bounds[0][2][1]) / 2]
+        
+        # Calculate the average center between the two layers
+        center = [(left_center[0] + right_center[0]) / 2, (left_center[1] + right_center[1]) / 2]
+        
+        # Center the map on the bounds
+        self.center = center
+
+        # Create a split control and add it to the map
+        split_control = ipyleaflet.SplitMapControl(left_layer=left_tile_layer, right_layer=right_tile_layer)
+        self.add_control(split_control)    

@@ -85,6 +85,7 @@ nav:
         - examples/physical_water_surface.ipynb
         - examples/vector.ipynb
         - examples/raster.ipynb
+        - examples/Google_Earth_Engine.ipynb
     - Labs:
         - labs/lab4.ipynb
         - labs/lab5.ipynb
