@@ -523,4 +523,34 @@ class Map(ipyleaflet.Map):
 
         # Create a split control and add it to the map
         split_control = ipyleaflet.SplitMapControl(left_layer=left_tile_layer, right_layer=right_tile_layer)
-        self.add_control(split_control)    
+        self.add_control(split_control) 
+        
+    def to_streamlit(self, width=None, height=600, scrolling=False, **kwargs):
+        """Renders map figure in a Streamlit app.
+
+        Args:
+            width (int, optional): Width of the map. Defaults to None.
+            height (int, optional): Height of the map. Defaults to 600.
+            responsive (bool, optional): Whether to make the map responsive. Defaults to True.
+            scrolling (bool, optional): If True, show a scrollbar when the content is larger than the iframe. Otherwise, do not show a scrollbar. Defaults to False.
+
+        Returns:
+            streamlit.components: components.html object.
+        """
+
+        try:
+            import streamlit.components.v1 as components
+
+            # if responsive:
+            #     make_map_responsive = """
+            #     <style>
+            #     [title~="st.iframe"] { width: 100%}
+            #     </style>
+            #     """
+            #     st.markdown(make_map_responsive, unsafe_allow_html=True)
+            return components.html(
+                self.to_html(), width=width, height=height, scrolling=scrolling
+            )
+
+        except Exception as e:
+            raise Exception(e)
