@@ -274,6 +274,7 @@ class Map(ipyleaflet.Map):
                 "OpenTopoMap",
                 "Esri.WorldImagery",
                 "Esri.NatGeoWorldMap",
+                "USGS Hydrography",
             ],
             description="Basemap",
         )

@@ -5,7 +5,7 @@ class Map(folium.Map):
 
     def __init__(self, center=[20, 0], zoom=2, **kwargs):
         super().__init__(location=center, zoom_start=zoom, **kwargs)
-
+        
     def add_raster(self, data, name="raster", **kwargs):
         """Adds a raster layer to the map.
 
@@ -23,7 +23,7 @@ class Map(folium.Map):
         layer = get_folium_tile_layer(client, name=name, **kwargs)
         layer.add_to(self)
     
-    def add_ee_layer(ee_object, vis_params={}, name="Layer untitled", shown=True, opacity=1.0):
+    def add_ee_layer(self, ee_object, vis_params={}, name="Layer untitled", shown=True, opacity=1.0):
         """
         Adds Earth Engine data layers to the map.
     
@@ -35,6 +35,7 @@ class Map(folium.Map):
             opacity (float, optional): The opacity of the layer (between 0 and 1). Defaults to 1.0.
         """
         try:
+            import ee  # Import ee here
             ee.Initialize()  # Initialize Earth Engine
             ee_object.getInfo()  # Check if the object is valid
         except Exception as e:
@@ -49,13 +50,10 @@ class Map(folium.Map):
     
         # Create a new tile layer
         tiles_url = map_id_dict['tile_fetcher'].url_format
-        map = folium.Map(location=[0, 0], zoom_start=3)
         folium.TileLayer(
             tiles=tiles_url,
             attr='Google Earth Engine',
             name=name,
             overlay=True,
             control=True
-        ).add_to(map)
-    
-        return map
+        ).add_to(self)

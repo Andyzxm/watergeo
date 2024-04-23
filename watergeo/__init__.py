@@ -5,3 +5,4 @@ __email__ = "andyzxm1101@gmail.com"
 __version__ = "0.0.8"
 
 from .watergeo import *
+from .foliumap import *
