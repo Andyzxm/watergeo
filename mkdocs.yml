@@ -79,7 +79,8 @@ nav:
     - FAQ: faq.md
     - Changelog: changelog.md
     - Report Issues: https://github.com/Xinming Andy Zhang/watergeo/issues
-    - Examples:
+    - Notebook:
+        - examples/0_Basic_features.ipynb
         - examples/Basemap.ipynb
         - examples/csv.ipynb
         - examples/physical_water_surface.ipynb

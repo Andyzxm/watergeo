@@ -3,10 +3,92 @@ from typing import Optional
 import ee
 
 class Map(folium.Map):
+    """The Map class inherits folium.Map. By default, the Map will add OpenStreetMap as the basemap.
 
-    def __init__(self, center=[20, 0], zoom=2, **kwargs):
-        super().__init__(location=center, zoom_start=zoom, **kwargs)
-        
+    Returns:
+        object: folium map object.
+    """
+
+    def __init__(self, **kwargs):
+        # Default map center location and zoom level
+        latlon = [20, 0]
+        zoom = 2
+
+        # Interchangeable parameters between ipyleaflet and folium
+        if "center" in kwargs:
+            kwargs["location"] = kwargs["center"]
+            kwargs.pop("center")
+        if "location" in kwargs:
+            latlon = kwargs["location"]
+        else:
+            kwargs["location"] = latlon
+
+        if "zoom" in kwargs:
+            kwargs["zoom_start"] = kwargs["zoom"]
+            kwargs.pop("zoom")
+        if "zoom_start" in kwargs:
+            zoom = kwargs["zoom_start"]
+        else:
+            kwargs["zoom_start"] = zoom
+        if "max_zoom" not in kwargs:
+            kwargs["max_zoom"] = 24
+
+        if "scale_control" not in kwargs:
+            kwargs["scale_control"] = True
+
+        if kwargs["scale_control"]:
+            kwargs["control_scale"] = True
+            kwargs.pop("scale_control")
+
+        # if "control_scale" not in kwargs:
+        #     kwargs["control_scale"] = True
+
+        if "draw_export" not in kwargs:
+            kwargs["draw_export"] = False
+
+        if "height" in kwargs and isinstance(kwargs["height"], str):
+            kwargs["height"] = float(kwargs["height"].replace("px", ""))
+
+        if (
+            "width" in kwargs
+            and isinstance(kwargs["width"], str)
+            and ("%" not in kwargs["width"])
+        ):
+            kwargs["width"] = float(kwargs["width"].replace("px", ""))
+
+        height = None
+        width = None
+
+        if "height" in kwargs:
+            height = kwargs.pop("height")
+        else:
+            height = 600
+
+        if "width" in kwargs:
+            width = kwargs.pop("width")
+        else:
+            width = "100%"
+
+        super().__init__(**kwargs)
+        self.baseclass = "folium"
+
+
+    def add_layer(self, layer):
+        """Adds a layer to the map.
+
+        Args:
+            layer (TileLayer): A TileLayer instance.
+        """
+        layer.add_to(self)
+    
+    def add_basemap(self, basemap):
+        if basemap == "OpenStreetMap":
+            folium.TileLayer('openstreetmap').add_to(self)
+        elif basemap == "Stamen Terrain":
+            folium.TileLayer('stamenterrain').add_to(self)
+        elif basemap == "Stamen Toner":
+            folium.TileLayer('stamentoner').add_to(self)
+
     def add_raster(self, data, name="raster", **kwargs):
         """Adds a raster layer to the map.
 
