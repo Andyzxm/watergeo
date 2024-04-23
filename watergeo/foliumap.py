@@ -1,3 +1,5 @@
+"""Module for creating interactive maps with the folium library."""
+
 import folium
 from typing import Optional
 import ee
