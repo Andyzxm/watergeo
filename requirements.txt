@@ -6,3 +6,4 @@ pandas
 earthengine-api>=0.1.398
 ee
 folium
+localtileserver

@@ -94,4 +94,5 @@ nav:
           - watergeo module: watergeo.md
           - common module: common.md
           - utility module: utility.md
+          - foliumap module: foliumap.md
 

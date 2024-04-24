@@ -1,97 +1,22 @@
-"""Module for creating interactive maps with the folium library."""
-
 import folium
-from typing import Optional
+from ipyleaflet import basemaps
 import ee
+from folium import plugins
+import geopandas as gpd
+import json
+
 
 class Map(folium.Map):
-    """The Map class inherits folium.Map. By default, the Map will add OpenStreetMap as the basemap.
 
-    Returns:
-        object: folium map object.
-    """
+    def __init__(self, center=[20, 0], zoom=2, **kwargs):
+        super().__init__(location=center, zoom_start=zoom, **kwargs)
 
-    def __init__(self, **kwargs):
-        # Default map center location and zoom level
-        latlon = [20, 0]
-        zoom = 2
+        if not ee.data._initialized:
+            ee.Authenticate()
+            ee.Initialize()
 
-        # Interchangeable parameters between ipyleaflet and folium
-        if "center" in kwargs:
-            kwargs["location"] = kwargs["center"]
-            kwargs.pop("center")
-        if "location" in kwargs:
-            latlon = kwargs["location"]
-        else:
-            kwargs["location"] = latlon
+    def add_raster(self, data, name="raster", zoom_to_layer=True, **kwargs):
 
-        if "zoom" in kwargs:
-            kwargs["zoom_start"] = kwargs["zoom"]
-            kwargs.pop("zoom")
-        if "zoom_start" in kwargs:
-            zoom = kwargs["zoom_start"]
-        else:
-            kwargs["zoom_start"] = zoom
-        if "max_zoom" not in kwargs:
-            kwargs["max_zoom"] = 24
-
-        if "scale_control" not in kwargs:
-            kwargs["scale_control"] = True
-
-        if kwargs["scale_control"]:
-            kwargs["control_scale"] = True
-            kwargs.pop("scale_control")
-
-        # if "control_scale" not in kwargs:
-        #     kwargs["control_scale"] = True
-
-        if "draw_export" not in kwargs:
-            kwargs["draw_export"] = False
-
-        if "height" in kwargs and isinstance(kwargs["height"], str):
-            kwargs["height"] = float(kwargs["height"].replace("px", ""))
-
-        if (
-            "width" in kwargs
-            and isinstance(kwargs["width"], str)
-            and ("%" not in kwargs["width"])
-        ):
-            kwargs["width"] = float(kwargs["width"].replace("px", ""))
-
-        height = None
-        width = None
-
-        if "height" in kwargs:
-            height = kwargs.pop("height")
-        else:
-            height = 600
-
-        if "width" in kwargs:
-            width = kwargs.pop("width")
-        else:
-            width = "100%"
-
-        super().__init__(**kwargs)
-        self.baseclass = "folium"
-
-
-    def add_layer(self, layer):
-        """Adds a layer to the map.
-
-        Args:
-            layer (TileLayer): A TileLayer instance.
-        """
-        layer.add_to(self)
-    
-    def add_basemap(self, basemap):
-        if basemap == "OpenStreetMap":
-            folium.TileLayer('openstreetmap').add_to(self)
-        elif basemap == "Stamen Terrain":
-            folium.TileLayer('stamenterrain').add_to(self)
-        elif basemap == "Stamen Toner":
-            folium.TileLayer('stamentoner').add_to(self)
-
-    def add_raster(self, data, name="raster", **kwargs):
         """Adds a raster layer to the map.
 
         Args:
@@ -107,89 +32,191 @@ class Map(folium.Map):
         client = TileClient(data)
         layer = get_folium_tile_layer(client, name=name, **kwargs)
         layer.add_to(self)
-    
-    def add_ee_layer(self, ee_object, vis_params={}, name="Layer untitled", shown=True, opacity=1.0):
-        """
-        Adds Earth Engine data layers to the map.
-    
-        Args:
-            ee_object (object): The Earth Engine object to add to the map.
-            vis_params (dict, optional): Visualization parameters. Defaults to {}.
-            name (str, optional): The name of the layer. Defaults to "Layer untitled".
-            shown (bool, optional): Whether to show the layer initially. Defaults to True.
-            opacity (float, optional): The opacity of the layer (between 0 and 1). Defaults to 1.0.
-        """
-        try:
-            import ee  # Import ee here
-            ee.Initialize()  # Initialize Earth Engine
-            ee_object.getInfo()  # Check if the object is valid
-        except Exception as e:
-            print("Error adding Earth Engine layer:", e)
-            return
-    
-        if isinstance(ee_object, ee.ImageCollection):
-            ee_object = ee_object.mosaic()
-    
-        # Generate a URL for fetching the tiles from Earth Engine
-        map_id_dict = ee.Image(ee_object).getMapId(vis_params)
-    
-        # Create a new tile layer
-        tiles_url = map_id_dict['tile_fetcher'].url_format
-        folium.TileLayer(
-            tiles=tiles_url,
-            attr='Google Earth Engine',
-            name=name,
-            overlay=True,
-            control=True
-        ).add_to(self)
 
-    def to_streamlit(
-        self,
-        width: Optional[int] = None,
-        height: Optional[int] = 600,
-        scrolling: Optional[bool] = False,
-        add_layer_control: Optional[bool] = True,
-        bidirectional: Optional[bool] = False,
-        **kwargs,
-    ):
-        """Renders `folium.Figure` or `folium.Map` in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
+
+    def add_tile_layer(self, url, name, attribution="Custom Tile", **kwargs):
+        """
+        Adds a tile layer to the current map.
 
         Args:
-            width (int, optional): Width of the map. Defaults to None.
-            height (int, optional): Height of the map. Defaults to 600.
-            scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.
-            add_layer_control (bool, optional): Whether to add the layer control. Defaults to True.
-            bidirectional (bool, optional): Whether to add bidirectional functionality to the map. The streamlit-folium package is required to use the bidirectional functionality. Defaults to False.
-
-        Raises:
-            ImportError: If streamlit is not installed.
+            url (str): The URL of the tile layer.
+            name (str): The name of the layer.
+            attribution (str, optional): The attribution text to be displayed for the layer. Defaults to "Custom Tile".
+            **kwargs: Arbitrary keyword arguments for additional layer options.
 
         Returns:
-            streamlit.components: components.html object.
+            None
+        """
+        layer = folium.TileLayer(tiles=url, name=name, attr=attribution, **kwargs)
+        layer.add_to(self)
+
+    def add_basemap(self, name, overlay=True):
+        """
+        Adds a basemap to the current map.
+
+        Args:
+            name (str or object): The name of the basemap as a string, or an object representing the basemap.
+            overlay (bool, optional): Whether the basemap is an overlay. Defaults to True.
+
+        Raises:
+            TypeError: If the name is neither a string nor an object representing a basemap.
+
+        Returns:
+            None
         """
 
+        if isinstance(name, str):
+            url = eval(f"basemaps.{name}").build_url()
+            self.add_tile_layer(url, name, overlay=overlay)
+        else:
+            name.add_to(self)
+
+    def to_streamlit(self, width=700, height=500):
+        """
+        Converts the map to a streamlit component.
+
+        Args:
+            width (int, optional): The width of the map. Defaults to 700.
+            height (int, optional): The height of the map. Defaults to 500.
+
+        Returns:
+            object: The streamlit component representing the map.
+        """
+
+        from streamlit_folium import folium_static
+
+        return folium_static(self, width=width, height=height)
+
+    def add_layer_control(self):
+        """
+        Adds a layer control to the map.
+
+        Returns:
+            None
+        """
+
+        folium.LayerControl().add_to(self)
+
+    def add_ee_layer(self, ee_object, vis_params, name):
+        """
+        Adds a Earth Engine layer to the current map.
+
+        Args:
+            ee_object (object): The Earth Engine object to be displayed.
+            vis_params (dict): Visualization parameters as a dictionary.
+            name (str): The name of the layer.
+
+        Returns:
+            None
+        """
+        ee.Initialize()
         try:
-            import streamlit.components.v1 as components
-
-            if add_layer_control:
-                self.add_layer_control()
-
-            if bidirectional:
-                from streamlit_folium import st_folium
-
-                output = st_folium(self, width=width, height=height)
-                return output
-            else:
-                # if responsive:
-                #     make_map_responsive = """
-                #     <style>
-                #     [title~="st.iframe"] { width: 100%}
-                #     </style>
-                #     """
-                #     st.markdown(make_map_responsive, unsafe_allow_html=True)
-                return components.html(
-                    self.to_html(), width=width, height=height, scrolling=scrolling
-                )
-
+            # Convert the Earth Engine layer to a TileLayer that can be added to a folium map.
+            map_id_dict = ee.Image(ee_object).getMapId(vis_params)
+            folium.raster_layers.TileLayer(
+                tiles=map_id_dict['tile_fetcher'].url_format,
+                attr='Map Data &copy; <a href="https://earthengine.google.com/">Google Earth Engine</a>',
+                name=name,
+                overlay=True,
+                control=True
+            ).add_to(self)
         except Exception as e:
-            raise Exception(e)
+            print(f"Could not display {name}: {e}")
+
+    def add_geojson(self, data, name="geojson", **kwargs):
+        """Adds a GeoJSON layer to the map.
+
+        Args:
+            data (str | dict): The GeoJSON data as a string or a dictionary.
+            name (str, optional): The name of the layer. Defaults to "geojson".
+        """
+        if isinstance(data, str):
+            with open(data) as f:
+                data = json.load(f)
+
+        folium.GeoJson(data, name=name, **kwargs).add_to(self)
+
+    def add_shp(self, data, name="shp", **kwargs):
+        """
+        Adds a shapefile to the current map.
+
+        Args:
+            data (str or dict): The path to the shapefile as a string, or a dictionary representing the shapefile.
+            name (str, optional): The name of the layer. Defaults to "shp".
+            **kwargs: Arbitrary keyword arguments.
+        """
+        if isinstance(data, str):
+            data = gpd.read_file(data).to_json()
+
+        self.add_geojson(data, name, **kwargs)
+
+
+    def add_vector(self, data, name="vector", **kwargs):
+        """
+        Adds a vector layer to the current map.
+
+        Args:
+            data (str, GeoDataFrame, dict): The vector data as a string (path to file), GeoDataFrame, or a dictionary.
+            name (str, optional): The name of the layer. Defaults to "vector".
+            **kwargs: Arbitrary keyword arguments.
+
+        Raises:
+            TypeError: If the data is not in a supported format.
+
+        Returns:
+            None
+        """
+        if isinstance(data, str):
+            if data.lower().endswith(('.geojson', '.json')):
+                # Load GeoJSON directly
+                with open(data) as f:
+                    data = json.load(f)
+                folium.GeoJson(data, name=name, **kwargs).add_to(self)
+            elif data.lower().endswith(('.shp')):
+                # Read shapefile using GeoPandas and convert to GeoJSON
+                gdf = gpd.read_file(data)
+                folium.GeoJson(gdf.__geo_interface__, name=name, **kwargs).add_to(self)
+            else:
+                raise TypeError("Unsupported vector data format.")
+        elif isinstance(data, gpd.GeoDataFrame):
+            folium.GeoJson(data.__geo_interface__, name=name, **kwargs).add_to(self)
+        elif isinstance(data, dict):
+            folium.GeoJson(data, name=name, **kwargs).add_to(self)
+        else:
+            raise TypeError("Unsupported vector data format.")   
+        
+    
+    
+    
+    def add_split_map(map_object, layer1, layer2, vis_params1, vis_params2):
+        # Create a DualMap
+        m = folium.plugins.DualMap()
+    
+        # Convert the layers to Earth Engine Images
+        image1 = ee.Image(layer1)
+        image2 = ee.Image(layer2)
+    
+        # Get the map ID dictionaries
+        map_id_dict1 = image1.getMapId(vis_params1)
+        map_id_dict2 = image2.getMapId(vis_params2)
+    
+        # Create the tile layers
+        tile_layer1 = folium.TileLayer(
+            tiles=map_id_dict1['tile_fetcher'].url_format,
+            attr='Google Earth Engine',
+            overlay=True,
+            name='layer1',
+        )
+        tile_layer2 = folium.TileLayer(
+            tiles=map_id_dict2['tile_fetcher'].url_format,
+            attr='Google Earth Engine',
+            overlay=True,
+            name='layer2',
+        )
+    
+        # Add the layers to the DualMap
+        tile_layer1.add_to(m.m1)
+        tile_layer2.add_to(m.m2)
+    
+        # Add the DualMap to the original map
+        map_object.add_child(m)
