@@ -185,21 +185,54 @@ class Map(folium.Map):
         else:
             raise TypeError("Unsupported vector data format.")   
         
-    
-    
-    
-    def add_split_map(map_object, layer1, layer2, vis_params1, vis_params2):
-        # Create a DualMap
-        m = folium.plugins.DualMap()
-    
+
+    def add_time_slider(self, ee_object, vis_params, name):
+        """
+        Adds a time slider to the map.
+
+        Args:
+            ee_object (object): The Earth Engine object to be displayed.
+            vis_params (dict): Visualization parameters as a dictionary.
+            name (str): The name of the layer.
+
+        Returns:
+            None
+        """
+        try:
+            # Convert the Earth Engine layer to a TileLayer that can be added to a folium map.
+            map_id_dict = ee.Image(ee_object).getMapId(vis_params)
+            folium.raster_layers.TileLayer(
+                tiles=map_id_dict['tile_fetcher'].url_format,
+                attr='Google Earth Engine',
+                name=name,
+                overlay=True,
+                control=True
+            ).add_to(self)
+        except Exception as e:
+            print(f"Could not display {name}: {e}")
+
+    def split_map(self, layer1, layer2, vis_params1, vis_params2, outline_layer=None):
+        """
+        Creates a split map with the given layers and visualization parameters.
+
+        Args:
+            layer1 (object): The first Earth Engine layer to be displayed.
+            layer2 (object): The second Earth Engine layer to be displayed.
+            vis_params1 (dict): Visualization parameters for the first layer.
+            vis_params2 (dict): Visualization parameters for the second layer.
+            outline_layer (object, optional): An optional Earth Engine layer to be displayed on both sides of the split map.
+
+        Returns:
+            folium.plugins.DualMap: The split map.
+        """
         # Convert the layers to Earth Engine Images
         image1 = ee.Image(layer1)
         image2 = ee.Image(layer2)
-    
+
         # Get the map ID dictionaries
         map_id_dict1 = image1.getMapId(vis_params1)
         map_id_dict2 = image2.getMapId(vis_params2)
-    
+
         # Create the tile layers
         tile_layer1 = folium.TileLayer(
             tiles=map_id_dict1['tile_fetcher'].url_format,
@@ -213,10 +246,33 @@ class Map(folium.Map):
             overlay=True,
             name='layer2',
         )
-    
-        # Add the layers to the DualMap
-        tile_layer1.add_to(m.m1)
-        tile_layer2.add_to(m.m2)
-    
-        # Add the DualMap to the original map
-        map_object.add_child(m)
+
+        # Create a DualMap
+        m = folium.plugins.DualMap(location=[0, 0], zoom_start=2)
+
+        # Add the layers to the map
+        m.m1.add_child(tile_layer1)
+        m.m2.add_child(tile_layer2)
+
+        # If an outline layer is provided, add it to both sides of the split map
+        if outline_layer is not None:
+            # Convert the outline layer to an Earth Engine Image
+            outline_image = ee.Image(outline_layer)
+
+            # Get the map ID dictionary
+            outline_map_id_dict = outline_image.getMapId()
+
+            # Create the outline tile layer
+            outline_tile_layer = folium.TileLayer(
+                tiles=outline_map_id_dict['tile_fetcher'].url_format,
+                attr='Google Earth Engine',
+                overlay=True,
+                name='outline',
+            )
+
+            # Add the outline layer to the map
+            m.m1.add_child(outline_tile_layer)
+            m.m2.add_child(outline_tile_layer)
+
+        # Return the split map
+        return m

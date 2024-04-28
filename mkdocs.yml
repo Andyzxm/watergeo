@@ -80,13 +80,12 @@ nav:
     - Changelog: changelog.md
     - Report Issues: https://github.com/Xinming Andy Zhang/watergeo/issues
     - Notebook:
-        - examples/0_Basic_features.ipynb
-        - examples/Basemap.ipynb
-        - examples/csv.ipynb
-        - examples/physical_water_surface.ipynb
-        - examples/vector.ipynb
-        - examples/raster.ipynb
-        - examples/Google_Earth_Engine.ipynb
+        - examples/1.Basic_features.ipynb
+        - examples/2.folium.ipynb
+        - examples/3.raster.ipynb
+        - examples/4.Google_Earth_Engine.ipynb
+        - examples/5.Splitmap.ipynb
+        - examples/6.Toolbars.ipynb
     - Labs:
         - labs/lab4.ipynb
         - labs/lab5.ipynb
