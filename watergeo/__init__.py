@@ -4,7 +4,7 @@ __author__ = """Xinming Zhang"""
 __email__ = "andyzxm1101@gmail.com"
 __version__ = "0.0.8"
 import os
-from .watergeo import Map
+from .watergeo import *
 
 def _in_colab_shell():
     """Tests if the code is being executed within Google Colab."""

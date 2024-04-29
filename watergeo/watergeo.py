@@ -9,6 +9,8 @@ import requests
 import os
 import tempfile
 from ipyleaflet import WidgetControl
+import pandas as pd
+from ipywidgets import interact
 
 
 
@@ -554,3 +556,36 @@ class Map(ipyleaflet.Map):
 
         except Exception as e:
             raise Exception(e)
+        
+
+
+    def add_time_slider(self, image_collection, vis_params):
+        # Convert the ImageCollection to a list
+        image_list = image_collection.toList(image_collection.size())
+
+        # Create a slider
+        slider = widgets.IntSlider(min=0, max=image_collection.size().getInfo() - 1, step=1, value=0)
+
+        # Define a function to update the map
+        def update_map(index):
+            # Get the selected image
+            image = ee.Image(image_list.get(index))
+
+            # Apply the visualization parameters
+            image = image.visualize(**vis_params)
+
+            # Generate a URL for the image
+            url = image.getThumbURL({'dimensions': '512x512', 'format': 'png'})
+
+            # Create an ImageOverlay
+            overlay = ipyleaflet.ImageOverlay(url=url, bounds=self.bounds)
+
+            # Clear all layers from the map
+            self.clear_layers()
+
+            # Add the new layer to the map
+            self.add_layer(overlay)
+
+        # Link the slider and the update function
+        interact(update_map, index=slider)
+    

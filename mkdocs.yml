@@ -86,6 +86,8 @@ nav:
         - examples/4.Google_Earth_Engine.ipynb
         - examples/5.Splitmap.ipynb
         - examples/6.Toolbars.ipynb
+        - examples/7.zonal_stat.ipynb
+        - examples/8.timeslider.ipynb
     - Labs:
         - labs/lab4.ipynb
         - labs/lab5.ipynb

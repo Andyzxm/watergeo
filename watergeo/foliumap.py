@@ -186,30 +186,45 @@ class Map(folium.Map):
             raise TypeError("Unsupported vector data format.")   
         
 
-    def add_time_slider(self, ee_object, vis_params, name):
+    def add_time_slider(self, ee_image_collection, vis_params, name_prefix):
         """
         Adds a time slider to the map.
 
         Args:
-            ee_object (object): The Earth Engine object to be displayed.
+            ee_image_collection (object): The Earth Engine ImageCollection to be displayed.
             vis_params (dict): Visualization parameters as a dictionary.
-            name (str): The name of the layer.
+            name_prefix (str): The prefix of the name of the layers.
 
         Returns:
             None
         """
         try:
-            # Convert the Earth Engine layer to a TileLayer that can be added to a folium map.
-            map_id_dict = ee.Image(ee_object).getMapId(vis_params)
-            folium.raster_layers.TileLayer(
-                tiles=map_id_dict['tile_fetcher'].url_format,
-                attr='Google Earth Engine',
-                name=name,
-                overlay=True,
-                control=True
-            ).add_to(self)
+            # Convert the Earth Engine ImageCollection to a list of Images
+            image_list = ee_image_collection.toList(ee_image_collection.size())
+
+            # Get the number of images
+            n = image_list.size().getInfo()
+
+            for i in range(n):
+                # Get the i-th image in the list
+                image = ee.Image(image_list.get(i))
+
+                # Get the date of the image
+                date = image.date().format('YYYY-MM-dd').getInfo()
+
+                # Convert the Earth Engine layer to a TileLayer that can be added to a folium map.
+                map_id_dict = image.getMapId(vis_params)
+
+                # Add the layer to the map
+                folium.raster_layers.TileLayer(
+                    tiles=map_id_dict['tile_fetcher'].url_format,
+                    attr='Google Earth Engine',
+                    name=f"{name_prefix} {date}",
+                    overlay=True,
+                    control=True
+                ).add_to(self)
         except Exception as e:
-            print(f"Could not display {name}: {e}")
+            print(f"Could not display {name_prefix}: {e}")
 
     def split_map(self, layer1, layer2, vis_params1, vis_params2, outline_layer=None):
         """
@@ -276,3 +291,5 @@ class Map(folium.Map):
 
         # Return the split map
         return m
+
+    
