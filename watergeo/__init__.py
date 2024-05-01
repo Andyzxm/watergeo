@@ -2,7 +2,7 @@
 
 __author__ = """Xinming Zhang"""
 __email__ = "andyzxm1101@gmail.com"
-__version__ = "0.0.8"
+__version__ = "0.0.9"
 import os
 from .watergeo import *
 
