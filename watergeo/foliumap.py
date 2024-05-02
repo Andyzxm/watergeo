@@ -292,4 +292,31 @@ class Map(folium.Map):
         # Return the split map
         return m
 
-    
+    def add_choropleth(self, geo_data, data, columns, key_on, fill_color='YlGn', fill_opacity=0.7, line_opacity=0.2, legend_name='Legend'):
+        """
+        Add a choropleth layer to the map.
+
+        Parameters:
+        geo_data (str or dict): URL, file path, or data (json/dict) that represents the geojson geometries.
+        data (DataFrame): Pandas dataframe containing the data.
+        columns (list): The columns in the dataframe that contain the key and values.
+        key_on (str): Variable in the `geo_data` file that contains the key.
+        fill_color (str, optional): Area fill color. Defaults to 'YlGn'.
+        fill_opacity (float, optional): Area fill opacity. Defaults to 0.7.
+        line_opacity (float, optional): Line opacity. Defaults to 0.2.
+        legend_name (str, optional): Legend title. Defaults to 'Legend'.
+        """
+
+        # Add the choropleth layer to the map
+        folium.Choropleth(
+            geo_data=geo_data,
+            data=data,
+            columns=columns,
+            key_on=key_on,
+            fill_color=fill_color,
+            fill_opacity=fill_opacity,
+            line_opacity=line_opacity,
+            legend_name=legend_name
+        ).add_to(self)
+
+        return self

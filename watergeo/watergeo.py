@@ -589,3 +589,37 @@ class Map(ipyleaflet.Map):
         # Link the slider and the update function
         interact(update_map, index=slider)
     
+    def add_choropleth(self, data, columns, key_on, name="choropleth", **kwargs):
+        import requests
+        import json
+    
+        """Adds a choropleth layer to the map.
+    
+        Args:
+            data (str | dict): The GeoJSON data as a string or a dictionary.
+            columns (list): The columns to use for the choropleth.
+            key_on (str): The key to use to match GeoJSON features with data.
+            name (str, optional): The name of the layer. Defaults to "choropleth".
+        """
+    
+        # If data is a URL, fetch the data from the URL
+        if isinstance(data, str) and data.startswith('http'):
+            response = requests.get(data)
+            data = json.loads(response.text)
+    
+        if isinstance(data, str):
+            with open(data) as f:
+                data = json.load(f)
+    
+        if "style" not in kwargs:
+            kwargs["style"] = {
+                "fillColor": "green",
+                "fillOpacity": 0.5,
+                "color": "black",
+                "weight": 1,
+            }
+    
+        layer = ipyleaflet.Choropleth(
+            data=data, columns=columns, key_on=key_on, name=name, **kwargs
+        )
+        self.add(layer)
