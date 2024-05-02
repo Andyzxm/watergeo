@@ -320,3 +320,19 @@ class Map(folium.Map):
         ).add_to(self)
 
         return self
+    
+    def to_streamlit(self, width=700, height=500):
+        """
+        Converts the map to a streamlit component.
+
+        Args:
+            width (int, optional): The width of the map. Defaults to 700.
+            height (int, optional): The height of the map. Defaults to 500.
+
+        Returns:
+            object: The streamlit component representing the map.
+        """
+
+        from streamlit_folium import folium_static
+
+        return folium_static(self, width=width, height=height)
