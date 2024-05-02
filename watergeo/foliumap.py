@@ -65,9 +65,31 @@ class Map(folium.Map):
             None
         """
 
+        basemaps = {
+            "OpenTopoMap": "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+            "OpenStreetMap": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            "Stamen Terrain": "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png",
+            "Stamen Toner": "https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
+            "Stamen Watercolor": "https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png",
+            "CartoDB Positron": "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+            "CartoDB Dark Matter": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+            "Esri WorldStreetMap": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+            "Esri DeLorme": "https://server.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer/tile/{z}/{y}/{x}",
+            "Esri WorldTopoMap": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+            "Esri WorldImagery": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            "Esri NatGeoWorldMap": "https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",
+            "HikeBike HikeBike": "https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png",
+            "MtbMap": "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png",
+            "CartoDB Voyager": "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+            # Add more basemaps here...
+        }
+
         if isinstance(name, str):
-            url = eval(f"basemaps.{name}").build_url()
-            self.add_tile_layer(url, name, overlay=overlay)
+            if name in basemaps:
+                url = basemaps[name]
+                self.add_tile_layer(url, name, overlay=overlay)
+            else:
+                print(f"Basemap '{name}' not found. Available basemaps are: {list(basemaps.keys())}")
         else:
             name.add_to(self)
 
