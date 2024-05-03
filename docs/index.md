@@ -23,8 +23,9 @@
 - Folium adaptation for data visualization
 - Google Earth Engine implementation for spatial analysis
 - Split map 
-- Time series
+- Time slider
 - Zonal statistics
+- Choropleth
 
 
 
