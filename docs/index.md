@@ -26,6 +26,7 @@
 - Time slider
 - Zonal statistics
 - Choropleth
+- Heatmap
 
 
 

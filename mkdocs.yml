@@ -89,6 +89,7 @@ nav:
         - examples/7.zonal_stat.ipynb
         - examples/8.timeslider.ipynb
         - examples/9.choropleth.ipynb
+        - examples/10.heatmap.ipynb
     - Labs:
         - labs/lab4.ipynb
         - labs/lab5.ipynb

@@ -358,3 +358,24 @@ class Map(folium.Map):
         from streamlit_folium import folium_static
 
         return folium_static(self, width=width, height=height)
+    
+    def add_heatmap(self, data, name="heatmap", radius=25, blur=15, gradient=None, min_opacity=0, max_zoom=18):
+        """
+        Adds a heatmap to the map.
+
+        Args:
+            data (list): List of points to generate the heatmap.
+            name (str, optional): The name of the heatmap layer. Defaults to "heatmap".
+            radius (int, optional): The radius of influence of each point (in pixels). Defaults to 25.
+            blur (int, optional): The intensity of the heatmap. Defaults to 15.
+            gradient (dict, optional): The color gradient config. Defaults to None.
+            min_opacity (float, optional): The minimum opacity of the heatmap. Defaults to 0.
+            max_zoom (int, optional): The maximum zoom level where the points are rendered. Defaults to 18.
+        """
+        # Create the heatmap layer
+        heatmap = plugins.HeatMap(data, name=name, radius=radius, blur=blur, gradient=gradient, min_opacity=min_opacity, max_zoom=max_zoom)
+
+        # Add the heatmap layer to the map
+        self.add_child(heatmap)
+
+        return self
