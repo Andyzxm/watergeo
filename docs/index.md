@@ -10,7 +10,8 @@
 -   Free software: MIT License
 -   Documentation: <https://github.com/Andyzxm/watergeo>
 -   Interactive streamlit webmap <https://watergeomap.streamlit.app/>
-    
+-   Introduction and tutorial video for watergeo <https://www.youtube.com/watch?v=CGeYn2DN1HM>
+
 ## Introduction
 - Background for water security on (Why watergeo and water study matters?)[Youtube](https://www.youtube.com/watch?v=C65iqOSCZOY)
 
