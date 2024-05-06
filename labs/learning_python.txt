@@ -1,0 +1,2 @@
+In Python, You can learn all kinds of cool programming tricks. These are the basics for something greater in the future! 
+In Python, You can even make maps and use them like GIS tools in Python as well. Incredible! 
